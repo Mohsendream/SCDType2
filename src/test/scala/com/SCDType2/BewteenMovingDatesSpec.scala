@@ -20,7 +20,7 @@ class BewteenMovingDatesSpec extends AnyFlatSpec with Matchers with GivenWhenThe
 
   import spark.implicits._
 
-  "BewteenMovingDates" should "return  1 Madiouni Mnchohsen kef 15-09-2010 06-07-2012  false" in {
+  "BewteenMovingDates Test1" should "return  1 Madiouni Mnchohsen kef 15-09-2010 06-07-2012  false" in {
     Given("the history dataframe and the updates dataframe")
     val historyDataframe = Seq(historyData_2(1L, "Madiouni", "Mohsen", "kef", "15-09-2010", "21-06-2014", true)).toDF()
     val updatesDataframe = Seq(updatesData_2(1L, "Madiouni", "Mohsen", "Tunis", "06-07-2012")).toDF()
@@ -28,6 +28,17 @@ class BewteenMovingDatesSpec extends AnyFlatSpec with Matchers with GivenWhenThe
     val result = betweenMovingDates(historyDataframe, updatesDataframe, spark)
     Then("the result should be returned")
     val expectedResult = Seq(historyData_2(1L, "Madiouni", "Mohsen", "Tunis", "06-07-2012", "21-06-2014", true),
+      historyData_2(1L, "Madiouni", "Mohsen", "kef", "15-09-2010", "06-07-2012", false)).toDF()
+    expectedResult.collect() should contain theSameElementsAs result.collect()
+  }
+  "BewteenMovingDates test 2" should "return  1 Madiouni Mohsen kef 15-09-2010 06-07-2012  false" in {
+    Given("the history dataframe and the updates dataframe")
+    val historyDataframe = Seq(historyData_2(1L, "Madiouni", "Mohsen", "kef", "15-09-2010", "Null", true)).toDF()
+    val updatesDataframe = Seq(updatesData_2(1L, "Madiouni", "Mohsen", "Tunis", "06-07-2012")).toDF()
+    When("BewteenMovingDates is invoked")
+    val result = betweenMovingDates(historyDataframe, updatesDataframe, spark)
+    Then("the result should be returned")
+    val expectedResult = Seq(historyData_2(1L, "Madiouni", "Mohsen", "Tunis", "06-07-2012", "Null", true),
       historyData_2(1L, "Madiouni", "Mohsen", "kef", "15-09-2010", "06-07-2012", false)).toDF()
     expectedResult.collect() should contain theSameElementsAs result.collect()
   }
