@@ -1,6 +1,6 @@
 package com.SCDType2
 
-import org.apache.spark.sql.functions.{col, lit}
+import org.apache.spark.sql.functions.{col, lit, to_date}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object BeforeMovedIn {
@@ -9,7 +9,7 @@ object BeforeMovedIn {
 
     val updatesWithDatesBeforeMovedIn = touchedHistory_2.join(unduplicateUpdates, touchedHistory_2.col("Id") === unduplicateUpdates.col("newId"), "inner")
       .where(col("newAddress") =!= col("Address"))
-      .where(col("newMovedIn") < col("movedIn"))
+      .where(to_date(col("newMovedIn"), "dd-MM-yyyy") < to_date(col("movedIn"), "dd-MM-yyyy"))
     val updatedRecords_3 = updatesWithDatesBeforeMovedIn.select(col("newId").as("id"), col("newFirstName").as("firstName"),
       col("newLastName").as("lastName"), col("newAddress").as("address"), col("newMovedIn"),
       col("movedIn"), col("movedOut"), col("status"))

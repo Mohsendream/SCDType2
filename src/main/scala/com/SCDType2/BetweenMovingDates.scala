@@ -10,13 +10,13 @@ object BetweenMovingDates {
     val updatesWithDatesBetweenMovedDates = touchedHistory.join(unduplicateUpdates, touchedHistory.col("Id") === unduplicateUpdates.col("newId"), "inner")
       .where(col("newAddress") =!= col("Address"))
       .where((to_date(col("newMovedIn"), "dd-MM-yyyy") >= to_date(col("movedIn"), "dd-MM-yyyy") and (to_date(col("newMovedIn"), "dd-MM-yyyy") < to_date(col("movedOut"), "dd-MM-yyyy"))) or
-        (to_date(col("newMovedIn"), "dd-MM-yyyy") >= to_date(col("movedIn") and col("movedOut") === "Null")))
+        (to_date(col("newMovedIn"), "dd-MM-yyyy") >= to_date(col("movedIn"), "dd-MM-yyyy") and col("movedOut") === "Null"))
     val updatedRecords_2 = updatesWithDatesBetweenMovedDates.select(col("newId").as("Id"), col("newFirstName").as("firstName"),
       col("newLastName").as("lastName"), col("newAddress").as("address"), col("newMovedIn"),col("movedIn"),
-      col("movedOut"))
+      col("movedOut"), col("status"))
       .withColumn("movedIn", col("newMovedIn"))
-      .withColumn("movedOut", lit("Null"))
-      .withColumn("status", lit(true))
+      .withColumn("movedOut", col("movedOut"))
+      .withColumn("status", col("status"))
       .drop(col("newMovedIn"))
     val updatedHistory_2 = updatesWithDatesBetweenMovedDates.select(col("Id"), col("firstName"), col("lastName"),
       col("address"), col("movedIn"), col("newMovedIn"), col("movedOut"), col("status"))
