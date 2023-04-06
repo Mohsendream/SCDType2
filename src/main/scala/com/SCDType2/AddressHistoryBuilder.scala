@@ -7,6 +7,8 @@ import com.SCDType2.DifferentId.differentId
 import com.SCDType2.AfterMovedOut.afterMovedOut
 import com.SCDType2.BetweenMovingDates.betweenMovingDates
 import com.SCDType2.BeforeMovedIn.beforeMovedIn
+import com.SCDType2.SameAddressLateArriving.sameAddressLateArriving
+import com.SCDType2.SameAddressBetweenDates.sameAddressBetweenDates
 
 object AddressHistoryBuilder {
 
@@ -14,9 +16,15 @@ object AddressHistoryBuilder {
 
     val unduplicateUpdates = duplicates(updatesDataframe, spark)
     val newHistory = differentId(historyDataframe, unduplicateUpdates, spark)
-    val afterMovedOutHistory = afterMovedOut(newHistory, unduplicateUpdates, spark)
-    val betweenMovingDatesHistory = betweenMovingDates(afterMovedOutHistory, unduplicateUpdates, spark)
-    val  result = beforeMovedIn(betweenMovingDatesHistory, unduplicateUpdates, spark)
-    result
+
+    val newUpdates =sameAddressBetweenDates(newHistory,unduplicateUpdates, spark)
+
+    val afterMovedOutHistory = afterMovedOut(newHistory, newUpdates, spark)
+    val betweenMovingDatesHistory = betweenMovingDates(afterMovedOutHistory, newUpdates, spark)
+    val beforeMovedInHistory = beforeMovedIn(betweenMovingDatesHistory, newUpdates, spark)
+    /*
+    val lateArrivingSameAddress = sameAddressLateArriving(beforeMovedInHistory, newUpdates, spark)
+    lateArrivingSameAddress*/
+    beforeMovedInHistory
   }
 }
