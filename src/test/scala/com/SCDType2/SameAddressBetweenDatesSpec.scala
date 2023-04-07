@@ -15,7 +15,7 @@ class SameAddressBetweenDatesSpec extends AnyFlatSpec with Matchers with GivenWh
 
   import spark.implicits._
 
-  "sameAddressBetweenDatesSpec" should "return a history table that doesnt care about that case" in {
+  "sameAddressBetweenDatesSpec" should "drop the these cases from the update table" in {
     Given("the history and the updates dataframes")
     val updatesDataframe = Seq(Updates(1L, "Madiouni", "Mohsen", "Kef", "15-09-2012"),
       Updates(2L, "Madiouni", "Haifa", "Liege", "15-09-2021"),

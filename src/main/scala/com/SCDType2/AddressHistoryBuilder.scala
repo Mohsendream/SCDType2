@@ -16,15 +16,11 @@ object AddressHistoryBuilder {
 
     val unduplicateUpdates = duplicates(updatesDataframe, spark)
     val newHistory = differentId(historyDataframe, unduplicateUpdates, spark)
-
-    val newUpdates =sameAddressBetweenDates(newHistory,unduplicateUpdates, spark)
-
-    val afterMovedOutHistory = afterMovedOut(newHistory, newUpdates, spark)
+    val newUpdates = sameAddressBetweenDates(newHistory, unduplicateUpdates, spark)
+    val lateArrivingSameAddress = sameAddressLateArriving(newHistory, newUpdates, spark)
+    val afterMovedOutHistory = afterMovedOut(lateArrivingSameAddress, newUpdates, spark)
     val betweenMovingDatesHistory = betweenMovingDates(afterMovedOutHistory, newUpdates, spark)
     val beforeMovedInHistory = beforeMovedIn(betweenMovingDatesHistory, newUpdates, spark)
-    /*
-    val lateArrivingSameAddress = sameAddressLateArriving(beforeMovedInHistory, newUpdates, spark)
-    lateArrivingSameAddress*/
     beforeMovedInHistory
   }
 }
