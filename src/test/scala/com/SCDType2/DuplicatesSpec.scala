@@ -6,7 +6,6 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-
 class DuplicatesSpec extends AnyFlatSpec with Matchers with GivenWhenThen {
   implicit val spark = SparkSession
     .builder()

@@ -6,8 +6,6 @@ import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-
-
 class BeforeMovedInSpec extends AnyFlatSpec with Matchers with GivenWhenThen {
 
   implicit val spark = SparkSession
