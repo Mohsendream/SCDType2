@@ -5,9 +5,9 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object AfterMovedOut {
 
-  def afterMovedOut(newHistory: DataFrame,unduplicateUpdates: DataFrame, spark: SparkSession): DataFrame = {
-    val updatesWithDatesAfterMovedOut = newHistory.join(unduplicateUpdates, newHistory.col("Id") === unduplicateUpdates.col("newId"), "inner")
-      .where(col("newAddress") =!= col("Address"))
+  def afterMovedOut(joinedDataFrame: DataFrame, newHistory:DataFrame, spark: SparkSession): DataFrame = {
+    val updatesWithDatesAfterMovedOut = joinedDataFrame
+      .where(col("newAddress") =!= col("address"))
       .where(to_date(col("newMovedIn"), "dd-MM-yyyy") >= to_date(col("movedOut"), "dd-MM-yyyy"))
     val updatedRecords_1 = updatesWithDatesAfterMovedOut.select(col("newId").as("Id"),
       col("newFirstName").as("firstName"), col("newLastName").as("lastName"),

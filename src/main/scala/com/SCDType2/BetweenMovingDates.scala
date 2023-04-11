@@ -5,10 +5,10 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object BetweenMovingDates {
 
-  def betweenMovingDates(touchedHistory: DataFrame, unduplicateUpdates: DataFrame, spark: SparkSession): DataFrame = {
+  def betweenMovingDates( joinedDataFrame: DataFrame, touchedHistory: DataFrame, spark: SparkSession): DataFrame = {
 
-    val updatesWithDatesBetweenMovedDates = touchedHistory.join(unduplicateUpdates, touchedHistory.col("Id") === unduplicateUpdates.col("newId"), "inner")
-      .where(col("newAddress") =!= col("Address"))
+    val updatesWithDatesBetweenMovedDates = joinedDataFrame
+      .where(col("newAddress") =!= col("address"))
       .where((to_date(col("newMovedIn"), "dd-MM-yyyy") >= to_date(col("movedIn"), "dd-MM-yyyy") and (to_date(col("newMovedIn"), "dd-MM-yyyy") < to_date(col("movedOut"), "dd-MM-yyyy"))) or
         (to_date(col("newMovedIn"), "dd-MM-yyyy") >= to_date(col("movedIn"), "dd-MM-yyyy") and col("movedOut") === "Null"))
     val updatedRecords_2 = updatesWithDatesBetweenMovedDates.select(col("newId").as("Id"), col("newFirstName").as("firstName"),
