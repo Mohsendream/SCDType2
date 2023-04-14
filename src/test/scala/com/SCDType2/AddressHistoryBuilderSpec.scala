@@ -36,7 +36,7 @@ class AddressHistoryBuilderSpec extends AnyFlatSpec with Matchers with GivenWhen
     Given("the history dataframe and the updates dataframe")
     val historyDataframe = Seq(History(1L, "Madiouni", "Mohsen", "Kef", "15-09-2010", "21-06-2014", true)).toDF()
     val updatesDataframe = Seq(Updates(1L, "Madiouni", "Mohsen", "France", "21-06-2014")).toDF()
-    When("AfteMovedOut is invoked")
+    When("differentId is invoked")
     val result = addressHistoryBuilder(historyDataframe, updatesDataframe, spark)
     Then("the result should be returned")
     val expectedResult = Seq(History(1L, "Madiouni", "Mohsen", "Kef", "15-09-2010", "21-06-2014", false),
@@ -47,7 +47,7 @@ class AddressHistoryBuilderSpec extends AnyFlatSpec with Matchers with GivenWhen
     Given("the history dataframe and the updates dataframe")
     val historyDataframe = Seq(History(1L, "Madiouni", "Mohsen", "kef", "15-09-2010", "21-06-2014", true)).toDF()
     val updatesDataframe = Seq(Updates(1L, "Madiouni", "Mohsen", "Tunis", "06-07-2012")).toDF()
-    When("BewteenMovingDates is invoked")
+    When("differentId is invoked")
     val result = addressHistoryBuilder(historyDataframe, updatesDataframe, spark)
     Then("the result should be returned")
     val expectedResult = Seq(History(1L, "Madiouni", "Mohsen", "Tunis", "06-07-2012", "21-06-2014", true),
@@ -59,7 +59,7 @@ class AddressHistoryBuilderSpec extends AnyFlatSpec with Matchers with GivenWhen
     Given("the history dataframe and the updates dataframe")
     val historyDataframe = Seq(History(1L, "Madiouni", "Mohsen", "kef", "15-09-2010", "Null", true)).toDF()
     val updatesDataframe = Seq(Updates(1L, "Madiouni", "Mohsen", "Tunis", "06-07-2012")).toDF()
-    When("BewteenMovingDates is invoked")
+    When("differentId is invoked")
     val result = addressHistoryBuilder(historyDataframe, updatesDataframe, spark)
     Then("the result should be returned")
     val expectedResult = Seq(History(1L, "Madiouni", "Mohsen", "Tunis", "06-07-2012", "Null", true),
@@ -71,11 +71,34 @@ class AddressHistoryBuilderSpec extends AnyFlatSpec with Matchers with GivenWhen
     Given("the history dataframe and the updates dataframe")
     val historyDataframe = Seq(History(1L, "Madiouni", "Mohsen", "kef", "15-09-2010", "Null", true)).toDF()
     val updatesDataframe = Seq(Updates(1L, "Madiouni", "Mohsen", "bouarada", "06-07-1995")).toDF()
-    When("addressHistoryBuilder is invoked")
+    When("differentId is invoked")
     val result = addressHistoryBuilder(historyDataframe, updatesDataframe, spark)
     Then("the result should be returned")
     val expectedResult = Seq(History(1L, "Madiouni", "Mohsen", "kef", "15-09-2010", "Null", true),
       History(1L, "Madiouni", "Mohsen", "bouarada", "06-07-1995", "15-09-2010", false)).toDF()
+    expectedResult.collect() should contain theSameElementsAs result.collect()
+  }
+  "Test6" should "return a history table updates with the first date when the same address" in {
+    Given("the history and the updates dataframes")
+    val updatesDataframe = Seq(Updates(1L, "Madiouni", "Mohsen", "Kef", "15-09-2009")).toDF()
+    val historyDataframe = Seq(History(1L, "Madiouni", "Mohsen", "Kef", "15-09-2010", "Null", true),
+      History(2L, "Madiouni", "Haifa", "Liege", "15-09-2020", "Null", true)).toDF()
+    When("duplicates is invoked")
+    val result = addressHistoryBuilder(historyDataframe, updatesDataframe, spark)
+    Then("the result should be returned")
+    val expectedResult = Seq(History(1L, "Madiouni", "Mohsen", "Kef", "15-09-2009", "Null", true),
+      History(2L, "Madiouni", "Haifa", "Liege", "15-09-2020", "Null", true)).toDF()
+    expectedResult.collect() should contain theSameElementsAs result.collect()
+  }
+  "Test7" should "return a history table that doesnt care about that case" in {
+    Given("the history and the updates dataframes")
+    val updatesDataframe = Seq(Updates(1L, "Madiouni", "Mohsen", "Kef", "15-09-2014")).toDF()
+    val historyDataframe = Seq(History(1L, "Madiouni", "Mohsen", "Kef", "15-09-2010", "10-08-2014", true)).toDF()
+    When("duplicates is invoked")
+    val result = addressHistoryBuilder(historyDataframe, updatesDataframe, spark)
+    Then("the result should be returned")
+    val expectedResult = Seq(History(1L, "Madiouni", "Mohsen", "Kef", "15-09-2010", "10-08-2014", false),
+      History(1L, "Madiouni", "Mohsen", "Kef", "15-09-2014", "Null", true)).toDF()
     expectedResult.collect() should contain theSameElementsAs result.collect()
   }
 }

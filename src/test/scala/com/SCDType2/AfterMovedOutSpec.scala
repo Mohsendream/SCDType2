@@ -5,8 +5,7 @@ import org.apache.spark.sql.SparkSession
 import org.scalatest.GivenWhenThen
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-
-
+import org.apache.spark.sql.functions._
 
 class AfterMovedOutSpec extends AnyFlatSpec with Matchers with GivenWhenThen {
 
@@ -23,7 +22,8 @@ class AfterMovedOutSpec extends AnyFlatSpec with Matchers with GivenWhenThen {
     val historyDataframe = Seq(History(1L, "Madiouni", "Mohsen", "Kef", "15-09-2010", "21-06-2014", true)).toDF()
     val updatesDataframe = Seq(Updates(1L, "Madiouni", "Mohsen", "France", "21-06-2014")).toDF()
     When("AfteMovedOut is invoked")
-    val result = afterMovedOut(historyDataframe, updatesDataframe, spark)
+    val joinedDataFrame = historyDataframe.join(updatesDataframe, historyDataframe.col("Id") === updatesDataframe.col("newId"), "inner")
+    val result = afterMovedOut(joinedDataFrame, historyDataframe, spark)
     Then("the result should be returned")
     val expectedResult = Seq(History(1L, "Madiouni", "Mohsen", "Kef", "15-09-2010", "21-06-2014", false),
       History(1L, "Madiouni", "Mohsen", "France", "21-06-2014", "Null", true)).toDF()

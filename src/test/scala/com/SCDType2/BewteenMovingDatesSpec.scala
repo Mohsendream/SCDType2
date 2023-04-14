@@ -20,8 +20,9 @@ class BewteenMovingDatesSpec extends AnyFlatSpec with Matchers with GivenWhenThe
     Given("the history dataframe and the updates dataframe")
     val historyDataframe = Seq(History(1L, "Madiouni", "Mohsen", "kef", "15-09-2010", "21-06-2014", true)).toDF()
     val updatesDataframe = Seq(Updates(1L, "Madiouni", "Mohsen", "Tunis", "06-07-2012")).toDF()
+    val joinedDataFrame = historyDataframe.join(updatesDataframe, historyDataframe.col("Id") === updatesDataframe.col("newId"), "inner")
     When("BewteenMovingDates is invoked")
-    val result = betweenMovingDates(historyDataframe, updatesDataframe, spark)
+    val result = betweenMovingDates(joinedDataFrame, historyDataframe, spark)
     Then("the result should be returned")
     val expectedResult = Seq(History(1L, "Madiouni", "Mohsen", "Tunis", "06-07-2012", "21-06-2014", true),
       History(1L, "Madiouni", "Mohsen", "kef", "15-09-2010", "06-07-2012", false)).toDF()
@@ -31,8 +32,9 @@ class BewteenMovingDatesSpec extends AnyFlatSpec with Matchers with GivenWhenThe
     Given("the history dataframe and the updates dataframe")
     val historyDataframe = Seq(History(1L, "Madiouni", "Mohsen", "kef", "15-09-2010", "Null", true)).toDF()
     val updatesDataframe = Seq(Updates(1L, "Madiouni", "Mohsen", "Tunis", "06-07-2012")).toDF()
+    val joinedDataFrame = historyDataframe.join(updatesDataframe, historyDataframe.col("Id") === updatesDataframe.col("newId"), "inner")
     When("BewteenMovingDates is invoked")
-    val result = betweenMovingDates(historyDataframe, updatesDataframe, spark)
+    val result = betweenMovingDates(joinedDataFrame, historyDataframe, spark)
     Then("the result should be returned")
     val expectedResult = Seq(History(1L, "Madiouni", "Mohsen", "Tunis", "06-07-2012", "Null", true),
       History(1L, "Madiouni", "Mohsen", "kef", "15-09-2010", "06-07-2012", false)).toDF()
